@@ -1,3 +1,7 @@
+import React from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { addToCart } from '../../store/carts';
+//import { decreaseInventory } from '../../store/products';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
@@ -6,18 +10,22 @@ import CardMedia from '@mui/material/CardMedia';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import { useSelector } from 'react-redux';
-
 
 export default function Products(props) {
-    const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+    //const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
     const activeCategory = useSelector((state) => state.categories.activeCategory);
     const dummyText = useSelector((state) => state.categories.dummyText);
 
     const products = useSelector((state) =>
         state.products.filter((product) => product.category === activeCategory)
+            .filter((product) => product.inventoryCount > 0)
     );
-
+    const dispatch = useDispatch();
+    const cartItems = useSelector((state) => state.cart.cartItems);
+    const handleAddToCart = (product) => {
+        dispatch(addToCart(product));
+        dispatch(decreaseInventory(product.id));
+    };
     return (
         <Container sx={{ py: 8 }} maxWidth="md">
             <Grid container spacing={4}>
@@ -36,7 +44,7 @@ export default function Products(props) {
                             />
                             <CardContent sx={{ flexGrow: 1 }}>
                                 <Typography gutterBottom variant="h5" component="h2">
-                                {product.name}
+                                    {product.name}
                                 </Typography>
                                 {/* <Typography>
                                 Price: ${product.price}
@@ -44,7 +52,7 @@ export default function Products(props) {
                                 </Typography> */}
                             </CardContent>
                             <CardActions>
-                                <Button size="small">ADD TO Cart</Button>
+                                <Button size="small" onClick={() => handleAddToCart(product)}>ADD TO Cart</Button>
                                 <Button size="small">VIEW DETAILS</Button>
                             </CardActions>
                         </Card>
